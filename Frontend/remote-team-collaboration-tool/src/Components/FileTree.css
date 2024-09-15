@@ -1,0 +1,35 @@
+/* FileTree.css */
+
+.file-tree-container {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.file-tree-sidebar {
+  width: 300px; /* Fixed width for the file tree sidebar */
+  border-right: 1px solid #ddd; /* Border to separate file tree from content */
+  overflow-y: auto; /* Allow scrolling if the file tree is long */
+  padding: 16px;
+  box-sizing: border-box;
+}
+
+.file-content {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto; /* Allow scrolling if the content is long */
+  box-sizing: border-box;
+}
+
+.file-content pre {
+  white-space: pre-wrap; /* Ensure long lines are wrapped */
+  overflow-wrap: break-word; /* Break long words */
+}
+
+.file-view, .file-download {
+  margin-top: 16px;
+}
+
+.view-button, .download-button {
+  margin-right: 8px;
+}
