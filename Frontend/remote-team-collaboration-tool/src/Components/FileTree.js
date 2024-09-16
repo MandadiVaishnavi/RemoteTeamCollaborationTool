@@ -6,7 +6,7 @@ import './FileTree.css'; // Import the CSS file
 
 const FileTree = ({ owner, repo, branch }) => {
   const [treeData, setTreeData] = useState(null);
-  const [fileContent, setFileContent] = useState(null);
+  const [fileContent, setFileContent] = useState('');
   const [selectedFilePath, setSelectedFilePath] = useState('');
   const [fileUrl, setFileUrl] = useState('');
   const [errorFetchingContent, setErrorFetchingContent] = useState(false);
@@ -18,26 +18,28 @@ const FileTree = ({ owner, repo, branch }) => {
         params: { owner, repo, branch, path },
       });
 
-      const items = await Promise.all(response.data.map(async (item) => {
-        if (item.name === 'node_modules') return null; // Skip node_modules folder
+      const items = await Promise.all(
+        response.data.map(async (item) => {
+          if (item.name === 'node_modules') return null; // Skip node_modules folder
 
-        if (item.type === 'dir') {
-          const children = await fetchTree(item.path); // Recursively fetch subdirectories
-          return {
-            name: item.name,
-            path: item.path,
-            type: item.type,
-            children,
-          };
-        } else {
-          return {
-            name: item.name,
-            path: item.path,
-            type: item.type,
-            download_url: item.download_url, // Add download URL for files
-          };
-        }
-      }));
+          if (item.type === 'dir') {
+            const children = await fetchTree(item.path); // Recursively fetch subdirectories
+            return {
+              name: item.name,
+              path: item.path,
+              type: item.type,
+              children,
+            };
+          } else {
+            return {
+              name: item.name,
+              path: item.path,
+              type: item.type,
+              download_url: item.download_url, // Add download URL for files
+            };
+          }
+        })
+      );
 
       return items.filter(Boolean); // Filter out null values
     } catch (error) {
@@ -95,7 +97,9 @@ const FileTree = ({ owner, repo, branch }) => {
         responseType: 'blob', // Important for handling binary data
       });
 
-      const blob = new Blob([response.data], { type: response.headers['content-type'] || 'application/octet-stream' });
+      const blob = new Blob([response.data], {
+        type: response.headers['content-type'] || 'application/octet-stream',
+      });
       const fileName = selectedFilePath.split('/').pop();
       const link = document.createElement('a');
       link.href = URL.createObjectURL(blob);
@@ -155,13 +159,17 @@ const FileTree = ({ owner, repo, branch }) => {
   return (
     <Box className="file-tree-container">
       <Box className="file-tree-sidebar">
-        <Text fontSize="lg" fontWeight="bold">File Tree</Text>
+        <Text fontSize="lg" fontWeight="bold">
+          File Tree
+        </Text>
         {renderTree(treeData)}
       </Box>
-      <Box className="file-content">
+      <Box className={`file-content ${selectedFilePath ? 'loaded' : ''}`}>
         {selectedFilePath && (
           <>
-            <Text fontSize="lg" fontWeight="bold">Content of {selectedFilePath}</Text>
+            <Text fontSize="lg" fontWeight="bold">
+              Content of {selectedFilePath}
+            </Text>
             <Box mt={2} p={4} border="1px" borderColor="gray.200" borderRadius="md" bg="gray.50">
               <pre>{fileContent}</pre>
             </Box>
